@@ -1,0 +1,165 @@
+@import "typography";
+@import "palette";
+@import "sizes";
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+body {
+    background-color: $background;
+}
+
+// Navbar
+//=========================
+.navbar {
+    background-color: $blue;
+}
+.navbar-brand {
+    width: 50px;
+    height: 50px;
+}
+.navbar-brand svg path{
+    color: $white;
+}
+.nav-item {
+    & + .nav-item {
+        margin-left: 20px;
+    }
+
+    @media screen and (max-width: 991.98px) {
+        & + .nav-item {
+            margin-left: 0px;
+        }
+    }
+}
+.nav-link {
+    font-family: $f-gotham-light;
+    font-weight: lighter;
+    color: $white;
+    display: flex;
+    align-items: center;
+
+    &:hover {
+        color: rgb(161, 161, 161);
+    }
+}
+.nav-link svg {
+    width: 20px;
+    height: 20px;
+    margin-right: 10px;
+}
+.search-bar {
+    width: 100%;
+    display: inline-flex;
+    justify-content: center;
+}
+.search-bar input[type="search"] {
+    width: calc(100% - 38px);
+    border-radius: 3px 0 0 3px;
+    border: none;
+}
+.search-bar button {
+    border-radius: 0 3px 3px 0;
+    color: rgb(116, 116, 116);
+    border: none;
+    background-color: #eee;
+    padding: 0;
+    height: 38px;
+    width: 38px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: .3s;
+
+    &:hover {
+        background-color: rgb(116, 116, 116);
+        color: #eee;
+    }
+}
+.search-bar button svg {
+    width: 20px;
+    height: 20px;
+}
+.user {
+    display: flex;
+    align-self: center;
+    justify-content: center;
+    margin-right: 20px;
+
+    &:hover {
+        cursor: pointer;
+    }
+    
+    &:hover svg path {
+        color: rgb(161, 161, 161);
+    }
+}
+.user svg {
+    width: 20px;
+    height: 20px;
+}
+.user svg path {
+    color: $white;
+}
+.navbar-toggler-icon svg path {
+    color: $white;
+}
+
+// Main
+//=========================
+main {
+    width: 100%;
+    padding-left: 30px;
+    padding-top: 30px;
+    padding-bottom: 30px;
+    display: flex;
+    justify-content: space-between;
+}
+
+// Aside
+//=========================
+.infos {
+    width: 100%;
+    border-radius: 0;
+}
+.infos .card-img-top {
+    object-fit: cover;
+    border-radius: 0;
+}
+
+// Posts
+//=========================
+.post {
+    border-radius: 0;
+
+    & + .post {
+        margin-top: 30px;
+    }
+}
+.post .card-img-top {
+    object-fit: cover;
+    border-radius: 0;
+}
+.post .big-title {
+    font-size: 2rem;
+    font-family: $f-gotham-ultra;
+}
+
+// Medias
+//=========================
+@media screen and (max-width: $md) {
+    // Navbar
+    //=========================
+    .user {
+        justify-content: left;
+        margin-top: 10px;
+    }
+    
+    // Sections
+    //=========================
+    section {
+        margin-top: 50px;
+    }
+}

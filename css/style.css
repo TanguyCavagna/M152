@@ -1,0 +1,211 @@
+@font-face {
+  font-family: "Gotham medium";
+  src: url("../fonts/Gotham-Medium.otf");
+}
+
+@font-face {
+  font-family: "Gotham light";
+  src: url("../fonts/Gotham-Light.otf");
+}
+
+@font-face {
+  font-family: "Gotham book";
+  src: url("../fonts/Gotham-Book.otf");
+}
+
+@font-face {
+  font-family: "Gotham ultra";
+  src: url("../fonts/Gotham-Ultra.otf");
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  -webkit-box-sizing: border-box;
+          box-sizing: border-box;
+}
+
+body {
+  background-color: #e9eaed;
+}
+
+.navbar {
+  background-color: #3b5999;
+}
+
+.navbar-brand {
+  width: 50px;
+  height: 50px;
+}
+
+.navbar-brand svg path {
+  color: #fff;
+}
+
+.nav-item + .nav-item {
+  margin-left: 20px;
+}
+
+@media screen and (max-width: 991.98px) {
+  .nav-item + .nav-item {
+    margin-left: 0px;
+  }
+}
+
+.nav-link {
+  font-family: "Gotham light";
+  font-weight: lighter;
+  color: #fff;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+}
+
+.nav-link:hover {
+  color: #a1a1a1;
+}
+
+.nav-link svg {
+  width: 20px;
+  height: 20px;
+  margin-right: 10px;
+}
+
+.search-bar {
+  width: 100%;
+  display: -webkit-inline-box;
+  display: -ms-inline-flexbox;
+  display: inline-flex;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+}
+
+.search-bar input[type="search"] {
+  width: calc(100% - 38px);
+  border-radius: 3px 0 0 3px;
+  border: none;
+}
+
+.search-bar button {
+  border-radius: 0 3px 3px 0;
+  color: #747474;
+  border: none;
+  background-color: #eee;
+  padding: 0;
+  height: 38px;
+  width: 38px;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  -webkit-transition: .3s;
+  transition: .3s;
+}
+
+.search-bar button:hover {
+  background-color: #747474;
+  color: #eee;
+}
+
+.search-bar button svg {
+  width: 20px;
+  height: 20px;
+}
+
+.user {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-item-align: center;
+      align-self: center;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  margin-right: 20px;
+}
+
+.user:hover {
+  cursor: pointer;
+}
+
+.user:hover svg path {
+  color: #a1a1a1;
+}
+
+.user svg {
+  width: 20px;
+  height: 20px;
+}
+
+.user svg path {
+  color: #fff;
+}
+
+.navbar-toggler-icon svg path {
+  color: #fff;
+}
+
+main {
+  width: 100%;
+  padding-left: 30px;
+  padding-top: 30px;
+  padding-bottom: 30px;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: justify;
+      -ms-flex-pack: justify;
+          justify-content: space-between;
+}
+
+.infos {
+  width: 100%;
+  border-radius: 0;
+}
+
+.infos .card-img-top {
+  -o-object-fit: cover;
+     object-fit: cover;
+  border-radius: 0;
+}
+
+.post {
+  border-radius: 0;
+}
+
+.post + .post {
+  margin-top: 30px;
+}
+
+.post .card-img-top {
+  -o-object-fit: cover;
+     object-fit: cover;
+  border-radius: 0;
+}
+
+.post .big-title {
+  font-size: 2rem;
+  font-family: "Gotham ultra";
+}
+
+@media screen and (max-width: 767.98px) {
+  .user {
+    -webkit-box-pack: left;
+        -ms-flex-pack: left;
+            justify-content: left;
+    margin-top: 10px;
+  }
+  section {
+    margin-top: 50px;
+  }
+}
+/*# sourceMappingURL=style.css.map */
