@@ -15,6 +15,7 @@
     <?php require_once './includes/nav.php'; ?>
 
     <main class="row">
+        <!-- ============= START INFOS ============= -->
         <aside class="col-lg-3 col-md-5 col-sm-12">
             <div class="card infos">
                 <img class="card-img-top" src="https://via.placeholder.com/500x500" alt="Card image cap">
@@ -24,7 +25,9 @@
                 </div>
             </div>
         </aside>
+        <!-- ============= END INFOS ============= -->
 
+        <!-- ============= START POSTS ============= -->
         <section class="col-lg-8 col-md-7 col-sm-12">
             <div class="card post">
                 <div class="card-body">
@@ -32,6 +35,7 @@
                 </div>
             </div>
         </section>
+        <!-- ============= END POSTS ============= -->
     </main>
 
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
