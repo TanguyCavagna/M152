@@ -1,17 +1,32 @@
 [
     {
         "title": "Mon article de test",
+        "category": "🍳 Cuisine",
         "resume": "Sugar plum icing I love croissant candy caramels marzipan I love.",
         "author": "John Doe"
     },
     {
         "title": "Article de test",
+        "category": "🎮 Loisirs",
         "resume": "Sugar plum icing I love croissant candy caramels marzipan I love.",
         "author": "John Doe"
     },
     {
         "title": "Mon second de test",
+        "category": "🍳 Cuisine",
         "resume": "Sugar plum icing I love croissant candy caramels marzipan I love.",
         "author": "John Doe"
+    },
+    {
+        "title": "John doe Mon second de test",
+        "category": "🎮 Loisirs",
+        "resume": "Sugar plum icing I love croissant candy caramels marzipan I love.",
+        "author": "Le rat géant"
+    },
+    {
+        "title": "John doe Mon second de test",
+        "category": "⛔ No category",
+        "resume": "Sugar plum icing I love croissant candy caramels marzipan I love.",
+        "author": "Le rat géant"
     }
 ]
