@@ -52,7 +52,7 @@ class MediaController extends EDatabaseController {
             VALUES(:type, :name, :creation, :modification)
         EX;
 
-        $creationTimestamp = round(microtime(true) * 1000);
+        $creationTimestamp = date("Y-m-d H:i:s");
 
         try {
             $this::beginTransaction();
@@ -66,13 +66,17 @@ class MediaController extends EDatabaseController {
 
             $lastInsertId = $this::getInstance()->lastInsertId();
 
-            $this::commit();
-
-            if (move_uploaded_file($tmp_name, $this->targetDir . $name)) {
+            if (!move_uploaded_file($tmp_name, $this->targetDir . $name)) {
                 if (!$this->LinkToPost($postId, $lastInsertId)) {
+                    $this::rollBack();
                     return false;
                 }
+            } else {
+                $this::rollBack();
+                return false;
             }
+
+            $this::commit();
             
             return true;
         } catch (\PDOException $e) {

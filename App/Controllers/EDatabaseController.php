@@ -2,6 +2,8 @@
 
 namespace App\Controllers;
 
+use App\Controllers\ExtendedPDO;
+
 /**
  * @author 	dominique.aigroz@edu.ge.ch
  */
@@ -41,8 +43,8 @@ class EDatabaseController {
             try {
 
                 $dsn = EDB_DBTYPE . ':host=' . EDB_HOST . ';port=' . EDB_PORT . ';dbname=' . EDB_DBNAME . ';charset=utf8';
-                self::$pdoInstance = new \PDO($dsn, EDB_USER, EDB_PASS);
-                self::$pdoInstance->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
+                self::$pdoInstance = new ExtendedPDO($dsn, EDB_USER, EDB_PASS);
+                self::$pdoInstance->setAttribute(ExtendedPDO::ATTR_ERRMODE, ExtendedPDO::ERRMODE_EXCEPTION);
             } catch (\PDOException $e) {
                 echo "KDatabase Error: " . $e->getMessage();
             }

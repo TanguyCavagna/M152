@@ -25,7 +25,7 @@ class PostController extends EDatabaseController {
             VALUES(:comment, :creation, :modification)
         EX;
 
-        $creationTimestamp = round(microtime(true) * 1000);
+        $creationTimestamp = date("Y-m-d H:i:s");
         $mediaController = new MediaController();
 
         try {
@@ -39,28 +39,20 @@ class PostController extends EDatabaseController {
 
             $lastInsertId = $this::getInstance()->lastInsertId();
 
-            $this::commit();
-
             if ($medias !== null) {
                 for ($i = 0; $i < count($medias['tmp_name']); $i++) {
                     $file_name = $medias['name'][$i];
                     $file_extension = '.' . pathinfo($file_name, PATHINFO_EXTENSION);
                     $final_file_name = uniqid() . $file_extension;
                 
-                    //* Inutile pour le moment mais à garder si jamais
-                    /*array_push($current_json_articles, [
-                        "title" => $post_body,
-                        "category" => "⛔ No category",
-                        "resume" => "Sugar plum icing I love croissant candy caramels marzipan I love.",
-                        "author" => "Tanguy Cavagna"
-                    ]);*/
-                
-                    if (!$mediaController->Insert($lastInsertId, $final_file_name, $medias['type'][$i], $medias['tmp_name'][$i], $file_extension)) {
+                    if ($mediaController->Insert($lastInsertId, $final_file_name, $medias['type'][$i], $medias['tmp_name'][$i], $file_extension)) {
+                        $this::rollBack();
                         return false;
                     }
                 }
             }
             
+            $this::commit();
             return true;
         } catch (\PDOException $e) {
             $this::rollBack();
