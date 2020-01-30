@@ -1,13 +1,13 @@
--- MySQL dump 10.17  Distrib 10.3.18-MariaDB, for debian-linux-gnu (x86_64)
+-- MySQL dump 10.13  Distrib 8.0.16, for Win64 (x86_64)
 --
--- Host: localhost    Database: m152
+-- Host: 127.0.0.1    Database: m152
 -- ------------------------------------------------------
--- Server version	10.3.18-MariaDB-0+deb10u1
+-- Server version	8.0.16
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
 /*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
-/*!40101 SET NAMES utf8mb4 */;
+ SET NAMES utf8 ;
 /*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
 /*!40103 SET TIME_ZONE='+00:00' */;
 /*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
@@ -15,61 +15,56 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
-CREATE DATABASE IF NOT EXISTS `m152`;
-USE `m152`;
-
 --
--- Table structure for table `Media`
+-- Table structure for table `media`
 --
 
-DROP TABLE IF EXISTS `Media`;
+DROP TABLE IF EXISTS `media`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `Media` (
+ SET character_set_client = utf8mb4 ;
+CREATE TABLE `media` (
   `idMedia` int(11) NOT NULL AUTO_INCREMENT,
   `typeMedia` varchar(45) NOT NULL,
   `nameMedia` varchar(100) NOT NULL,
-  `creationDate` datetime NOT NULL,
-  `modificationDate` datetime NOT NULL,
+  `creationDate` timestamp NOT NULL,
+  `modificationDate` timestamp NOT NULL,
   PRIMARY KEY (`idMedia`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Table structure for table `Own`
+-- Table structure for table `own`
 --
 
-DROP TABLE IF EXISTS `Own`;
+DROP TABLE IF EXISTS `own`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `Own` (
+ SET character_set_client = utf8mb4 ;
+CREATE TABLE `own` (
   `idPost` int(11) NOT NULL,
   `idMedia` int(11) NOT NULL,
   KEY `fk_Own_Post_idx` (`idPost`),
   KEY `fk_Own_Media1_idx` (`idMedia`),
-  CONSTRAINT `fk_Own_Media1` FOREIGN KEY (`idMedia`) REFERENCES `Media` (`idMedia`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  CONSTRAINT `fk_Own_Post` FOREIGN KEY (`idPost`) REFERENCES `Post` (`idPost`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+  CONSTRAINT `fk_Own_Media1` FOREIGN KEY (`idMedia`) REFERENCES `media` (`idMedia`),
+  CONSTRAINT `fk_Own_Post` FOREIGN KEY (`idPost`) REFERENCES `post` (`idPost`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Table structure for table `Post`
+-- Table structure for table `post`
 --
 
-DROP TABLE IF EXISTS `Post`;
+DROP TABLE IF EXISTS `post`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `Post` (
+ SET character_set_client = utf8mb4 ;
+CREATE TABLE `post` (
   `idPost` int(11) NOT NULL AUTO_INCREMENT,
-  `commentary` varchar(255) NOT NULL,
-  `creationDate` datetime NOT NULL,
-  `modificationDate` datetime NOT NULL,
+  `commentary` varchar(255) COLLATE utf8mb4_bin NOT NULL,
+  `creationDate` timestamp NOT NULL,
+  `modificationDate` timestamp NOT NULL,
   PRIMARY KEY (`idPost`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
-
-ALTER TABLE `Post` CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_bin;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
 /*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
@@ -79,4 +74,4 @@ ALTER TABLE `Post` CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_bin;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2020-01-25 15:02:08
+-- Dump completed on 2020-01-30 21:18:19

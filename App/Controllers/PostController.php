@@ -25,7 +25,7 @@ class PostController extends EDatabaseController {
             VALUES(:comment, :creation, :modification)
         EX;
 
-        $creationDate = date('Y-m-d');
+        $creationTimestamp = round(microtime(true) * 1000);
         $mediaController = new MediaController();
 
         try {
@@ -33,8 +33,8 @@ class PostController extends EDatabaseController {
 
             $requestInsert = $this::getInstance()->prepare($insertQuery);
             $requestInsert->bindParam(':comment', $comment);
-            $requestInsert->bindParam(':creation', $creationDate);
-            $requestInsert->bindParam(':modification', $creationDate);
+            $requestInsert->bindParam(':creation', $creationTimestamp);
+            $requestInsert->bindParam(':modification', $creationTimestamp);
             $requestInsert->execute();
 
             $lastInsertId = $this::getInstance()->lastInsertId();

@@ -145,7 +145,7 @@ form.addEventListener('submit', e => {
         if (xhr.status === 200) { // OK
             const response = JSON.parse(xhr.responseText);
 
-            if (response.errors.lenght === 0) {
+            if (response.errors.length === 0) {
                 // No errors: redirect to the home page
                 window.location.href = 'index.php';
             } else {

@@ -52,7 +52,7 @@ class MediaController extends EDatabaseController {
             VALUES(:type, :name, :creation, :modification)
         EX;
 
-        $creationDate = date('Y-m-d');
+        $creationTimestamp = round(microtime(true) * 1000);
 
         try {
             $this::beginTransaction();
@@ -60,8 +60,8 @@ class MediaController extends EDatabaseController {
             $requestInsert = $this::getInstance()->prepare($insertQuery);
             $requestInsert->bindParam(':type', $type);
             $requestInsert->bindParam(':name', $name);
-            $requestInsert->bindParam(':creation', $creationDate);
-            $requestInsert->bindParam(':modification', $creationDate);
+            $requestInsert->bindParam(':creation', $creationTimestamp);
+            $requestInsert->bindParam(':modification', $creationTimestamp);
             $requestInsert->execute();
 
             $lastInsertId = $this::getInstance()->lastInsertId();
