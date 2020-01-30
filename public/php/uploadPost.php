@@ -9,6 +9,7 @@ define('TARGET_DIR', 'uploads/');
 define('TOTAL_MAX_SIZE', 20000000); // byte
 define('SINGLE_MAX_SIZE', 3000000); // byte
 define('ALLOWED_TYPES', [
+    'image/',
     'audio/',
     'video/',
 ]);
@@ -43,10 +44,9 @@ if ($files !== null) {
         $all_files_size += $files['size'][$i];
 
         // Type
-        foreach (ALLOWED_TYPES as $type) {
-            if (strpos($files['type'][$i], $type) === false) {
-                $file_type_error = true;
-            }
+        $type = explode('/', $files['type'][$i])[0] . '/';
+        if (!in_array($type, ALLOWED_TYPES)) {
+            $file_type_error = true;
         }
     }
 
