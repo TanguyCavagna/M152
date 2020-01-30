@@ -1,0 +1,15 @@
+{
+    "name": "tanguycvgn/m152",
+    "authors": [
+        {
+            "name": "TanguyCavagna",
+            "email": "tanguy.cvgn@eduge.ch"
+        }
+    ],
+    "require": {},
+    "autoload": {
+        "psr-4": {
+            "App\\": "App/"
+        }
+    }
+}
