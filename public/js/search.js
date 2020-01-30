@@ -6,12 +6,12 @@ const searchResults = document.querySelector('.search-results');
  * @param {string} searchText Search-bar value
  */
 const searchArticles = async searchText => {
-    const res = await fetch('./json/articles.json');
+    const res = await fetch('../json/articles.json');
     const articles = await res.json();
 
     // Get matches to current text input
     let matches = articles.filter(article => {
-        const regex = new RegExp(`^${searchText}`, 'gi');
+        const regex = new RegExp(`^${searchText.replace('\'', '&#39;')}`, 'gi');
         return article.title.match(regex) || article.author.match(regex);
     });
 
@@ -45,7 +45,7 @@ const outputMatches = (matches, searchText) => {
                 </div>`;
             }
 
-            const regex = new RegExp(`^${searchText}`, 'gi'); // To find the highligthed text
+            const regex = new RegExp(`^${searchText.replace('\'', '&#39;')}`, 'gi'); // To find the highligthed text
             
             category = document.querySelector(`.search-results .${match.category.split(' ')[0].toLowerCase()} .search-results__category-elements`);
             let highlightTitle = match.title.match(regex);
