@@ -1,3 +1,4 @@
 /vendor/
 config
 /.vscode/
+/tmp_files/
