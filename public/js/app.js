@@ -157,6 +157,10 @@ form.addEventListener('submit', e => {
                 'Les fichiers téléversés sont trop volumineux et sont refusés par le serveur. ' +
                 'Veuillez tenter d’envoyer moins de fichiers à la fois.'
             );
+        } else if (xhr.status === 415) {
+            console.log('Un des types des médias mis en ligne n\'est pas pris en compte.');
+        } else if (xhr.status === 422) {
+            console.log('Un élément du formulaire semble être vide.');
         } else if (xhr.status !== 0) {
             console.log(`Erreur HTTP ${xhr.status}. Veuillez réessayer.`);
         } else {
