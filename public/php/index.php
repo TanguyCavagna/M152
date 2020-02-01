@@ -1,3 +1,12 @@
+<?php
+require __DIR__ . '/../../vendor/autoload.php';
+
+use App\Controllers\PostController;
+
+$postController = new PostController();
+
+var_dump($postController->GetAll());
+?>
 <!DOCTYPE html>
 <html lang="en">
 

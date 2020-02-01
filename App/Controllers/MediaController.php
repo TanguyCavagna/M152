@@ -66,7 +66,7 @@ class MediaController extends EDatabaseController {
 
             $lastInsertId = $this::getInstance()->lastInsertId();
 
-            if (!move_uploaded_file($tmp_name, $this->targetDir . $name)) {
+            if (move_uploaded_file($tmp_name, $this->targetDir . $name)) {
                 if (!$this->LinkToPost($postId, $lastInsertId)) {
                     $this::rollBack();
                     return false;
