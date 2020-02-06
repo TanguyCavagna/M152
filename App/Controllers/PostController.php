@@ -63,10 +63,15 @@ class PostController extends EDatabaseController {
 
     public function GetAll(): ?array {
         $selectQuery = <<<EX
-            SELECT {$this->tableName}.{$this->fieldComment}, {$this->tableName}.{$this->fieldCreation} AS postCreationDate, media.nameMedia, media.typeMedia, media.creationDate as mediaCreationDate FROM post
-            LEFT JOIN own ON own.idPost = {$this->tableName}.{$this->fieldId}
-            LEFT JOIN media ON media.idMedia = own.idMedia
-            GROUP BY {$this->tableName}.{$this->fieldId}
+            SELECT 	{$this->tableName}.{$this->fieldComment},
+                    {$this->tableName}.{$this->fieldCreation},
+                    group_concat(media.nameMedia ORDER BY media.idMedia) AS medias,
+                    group_concat(media.typeMedia ORDER BY media.idMedia) AS `types`
+            FROM post
+            JOIN own ON own.idPost = post.idPost
+            JOIN media ON media.idMedia = own.idMedia
+            WHERE own.idPost = post.idPost
+            GROUP BY post.idPost
         EX;
 
         try {
