@@ -59,7 +59,7 @@ $posts = $postController->GetAll();
                                         <source src="../uploads/<?= $media ?>" type="<?= $types[$key] ?>">
                                     </audio>
                                 <?php elseif (strpos($types[$key], 'video') !== false): ?>
-                                    <video controls loop autoplay muted>
+                                    <video loop autoplay muted>
                                         <source src="../uploads/<?= $media ?>" type="<?= $types[$key] ?>">
                                     </video>
                                 <?php endif; ?>
