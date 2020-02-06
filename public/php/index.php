@@ -1,3 +1,12 @@
+<?php
+require __DIR__ . '/../../vendor/autoload.php';
+
+use App\Controllers\PostController;
+
+$postController = new PostController();
+
+$posts = $postController->GetAll();
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -34,6 +43,39 @@
                     <h5 class="card-title big-title">WELCOME</h5>
                 </div>
             </div>
+
+            <?php foreach ($posts as $post): 
+                $medias = explode(',', $post['medias']); 
+                $types = explode(',', $post['types']); 
+            ?>
+                <div class="card post">
+                    <div class="medias">
+                        <?php foreach($medias as $key => $media): ?>
+                            <div class="media">
+                                <?php if (strpos($types[$key], 'image') !== false): ?>
+                                    <img src="../uploads/<?= $media ?>" alt="" class="card-top">
+                                <?php elseif (strpos($types[$key], 'audio') !== false): ?>
+                                    <audio controls>
+                                        <source src="../uploads/<?= $media ?>" type="<?= $types[$key] ?>">
+                                    </audio>
+                                <?php elseif (strpos($types[$key], 'video') !== false): ?>
+                                    <video loop autoplay muted>
+                                        <source src="../uploads/<?= $media ?>" type="<?= $types[$key] ?>">
+                                    </video>
+                                <?php endif; ?>
+                            </div>
+                        <?php endforeach; ?>
+                    </div>
+                    <div class="card-body">
+                        <p class="post-comment"><?= $post['commentary'] ?></p>
+                    </div>
+
+                    <div class="card-footer">
+                        <button>Supprimer</button>
+                        <button>Modifer</button>
+                    </div>
+                </div>
+            <?php endforeach; ?>
         </section>
         <!-- ============= END POSTS ============= -->
     </main>

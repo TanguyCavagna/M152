@@ -6,7 +6,7 @@ require __DIR__ . '/../../vendor/autoload.php';
 use \App\Controllers\PostController;
 
 define('TARGET_DIR', 'uploads/');
-define('TOTAL_MAX_SIZE', 20000000); // byte
+define('TOTAL_MAX_SIZE', 70000000); // byte
 define('SINGLE_MAX_SIZE', 3000000); // byte
 define('ALLOWED_TYPES', [
     'image/',

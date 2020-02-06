@@ -44,8 +44,8 @@ class PostController extends EDatabaseController {
                     $file_name = $medias['name'][$i];
                     $file_extension = '.' . pathinfo($file_name, PATHINFO_EXTENSION);
                     $final_file_name = uniqid() . $file_extension;
-                
-                    if ($mediaController->Insert($lastInsertId, $final_file_name, $medias['type'][$i], $medias['tmp_name'][$i], $file_extension)) {
+                    
+                    if (!$mediaController->Insert($lastInsertId, $final_file_name, $medias['type'][$i], $medias['tmp_name'][$i], $file_extension)) {
                         $this::rollBack();
                         return false;
                     }
@@ -58,6 +58,37 @@ class PostController extends EDatabaseController {
             $this::rollBack();
 
             return false;
+        }
+    }
+
+    public function GetAll(): ?array {
+        $selectQuery = <<<EX
+            SELECT 	{$this->tableName}.{$this->fieldComment},
+                    {$this->tableName}.{$this->fieldCreation},
+                    group_concat(media.nameMedia ORDER BY media.idMedia) AS medias,
+                    group_concat(media.typeMedia ORDER BY media.idMedia) AS `types`
+            FROM post
+            JOIN own ON own.idPost = post.idPost
+            JOIN media ON media.idMedia = own.idMedia
+            WHERE own.idPost = post.idPost
+            GROUP BY post.idPost
+        EX;
+
+        try {
+            $results = [];
+
+            $this::beginTransaction();
+
+            $requestSelect = $this::getInstance()->prepare($selectQuery);
+            $requestSelect->execute();
+            $results = $requestSelect->fetchAll(\PDO::FETCH_ASSOC);
+
+            $this::commit();
+
+            return $results;
+        } catch (\PDOException $e) {
+            $this::rollback();
+            return null;
         }
     }
 }

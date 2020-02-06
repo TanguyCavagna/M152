@@ -15,13 +15,16 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
+CREATE DATABASE IF NOT EXISTS `m152`;
+USE `m152`;
+
 --
 -- Table structure for table `media`
 --
 
 DROP TABLE IF EXISTS `media`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
- SET character_set_client = utf8mb4 ;
+ SET character_set_client = utf8 ;
 CREATE TABLE `media` (
   `idMedia` int(11) NOT NULL AUTO_INCREMENT,
   `typeMedia` varchar(45) NOT NULL,
@@ -29,7 +32,7 @@ CREATE TABLE `media` (
   `creationDate` timestamp NOT NULL,
   `modificationDate` timestamp NOT NULL,
   PRIMARY KEY (`idMedia`)
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -38,7 +41,7 @@ CREATE TABLE `media` (
 
 DROP TABLE IF EXISTS `own`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
- SET character_set_client = utf8mb4 ;
+ SET character_set_client = utf8 ;
 CREATE TABLE `own` (
   `idPost` int(11) NOT NULL,
   `idMedia` int(11) NOT NULL,
@@ -46,7 +49,7 @@ CREATE TABLE `own` (
   KEY `fk_Own_Media1_idx` (`idMedia`),
   CONSTRAINT `fk_Own_Media1` FOREIGN KEY (`idMedia`) REFERENCES `media` (`idMedia`),
   CONSTRAINT `fk_Own_Post` FOREIGN KEY (`idPost`) REFERENCES `post` (`idPost`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -55,14 +58,14 @@ CREATE TABLE `own` (
 
 DROP TABLE IF EXISTS `post`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
- SET character_set_client = utf8mb4 ;
+ SET character_set_client = utf8 ;
 CREATE TABLE `post` (
   `idPost` int(11) NOT NULL AUTO_INCREMENT,
-  `commentary` varchar(255) COLLATE utf8mb4_bin NOT NULL,
+  `commentary` varchar(255) COLLATE utf8_bin NOT NULL,
   `creationDate` timestamp NOT NULL,
   `modificationDate` timestamp NOT NULL,
   PRIMARY KEY (`idPost`)
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 

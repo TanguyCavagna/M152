@@ -220,13 +220,29 @@ main:not(.add-post) {
         margin-top: 30px;
     }
 }
-.post .card-img-top {
-    object-fit: cover;
-    border-radius: 0;
+.post { border-radius: 0; }
+.post .medias {
+    padding: 0;
+}
+.post .medias .media {
+    padding: 0;
+    width: 100%;
+    justify-content: center;
+
+    & + .media { margin-top: 10px; }
+}
+.post .medias .media audio {
+    width: 95%;
+    border-radius: 15px;
 }
 .post .big-title {
     font-size: 2rem;
     font-family: $f-gotham-ultra;
+}
+.post .post-comment {
+    margin: 0;
+    font-size: 1.2rem;
+    font-family: $f-gotham-light;
 }
 .add-post {
     width: 100%;
