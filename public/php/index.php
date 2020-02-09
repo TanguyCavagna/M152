@@ -54,8 +54,9 @@ $posts = $postController->GetAll();
     <script src="../js/search.js" defer></script>
     <script src="../js/post.js" type="module" defer></script>
     <script defer>
+        const postsDOM = document.querySelector('.posts');
+        
         $(document).ready(() => {
-            const postsDOM = document.querySelector('.posts');
 
             fetch('./getAll.php')
             .then(response => {
@@ -67,40 +68,48 @@ $posts = $postController->GetAll();
                 posts.forEach(post => {
                     $(postsDOM).append(`<my-post comment="${post.commentary}" medias="${post.medias}" types="${post.types}" id="${post.idPost}"></my-post>`);
                 });
-
-                const shadowPost = document.querySelector('my-post').shadowRoot;
-                const deleteBtn = shadowPost.querySelector('.delete');
-                const editBtn = shadowPost.querySelector('.edit');
-                const id = $(deleteBtn).parent().parent()[0].dataset.id;
-
-                deleteBtn.addEventListener('click', () => {
-                    let formData = new FormData();
-                    formData.append('id', id);
-
-                    const init = {
-                        method: 'POST',
-                        headers: {
-                            'Accept': 'application/json',
-                        },
-                        body: formData
-                    };
-
-                    fetch('./deletePost.php', init)
-                    .then(response => {
-                        return response.json();
-                    })
-                    .then(json => {
-                        console.log(json);
-                    })
-                    .catch(err => {
-                        console.error(err);
-                    });
-                });
             })
             .catch(err => {
                 console.error(err);
             })
         });
+
+        let deletePost = el => {
+            const id = $(el).parent().parent()[0].dataset.id;
+
+            let formData = new FormData();
+            formData.append('id', id);
+
+            const init = {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                },
+                body: formData
+            };
+
+            fetch('./deletePost.php', init)
+            .then(response => {
+                if (response.status === 200) {
+                    $(postsDOM).empty();
+
+                    fetch('./getAll.php')
+                    .then(response => {
+                        return response.json();
+                    })
+                    .then(json => {
+                        const posts = json.posts;
+
+                        posts.forEach(post => {
+                            $(postsDOM).append(`<my-post comment="${post.commentary}" medias="${post.medias}" types="${post.types}" id="${post.idPost}"></my-post>`);
+                        });
+                    });
+                }
+            })
+            .catch(err => {
+                console.error(err);
+            });
+        };
     </script>
 </body>
 

@@ -54,18 +54,18 @@ if ($files !== null) {
         $size_error = true;
     }
 
-    if ($file_type_error === true) {
-        http_response_code(415);
-        echo json_encode([
-            'errors' => 'Un des type de fichier n\'est pas pris en compte.'
-        ]);
-        exit();
-    }
-
     if ($size_error === true) {
         http_response_code(413);
         echo json_encode([
             'errors' => 'Taille maximum de fichiers excédé.'
+        ]);
+        exit();
+    }
+
+    if ($file_type_error === true) {
+        http_response_code(415);
+        echo json_encode([
+            'errors' => 'Un des type de fichier n\'est pas pris en compte.'
         ]);
         exit();
     }

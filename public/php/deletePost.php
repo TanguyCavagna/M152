@@ -16,7 +16,9 @@ if (empty($id)) {
     exit();
 }
 
-if (!is_int($i)) {
+try {
+    $id = intval($id);
+} catch (\Exception $e) {
     http_response_code(415);
     echo json_encode([
         'errors' => 'L\'id doit strictement être un entier.'
@@ -24,7 +26,7 @@ if (!is_int($i)) {
     exit();
 }
 
-if ($postController->DeletePost($id)) {
+if ($postController->Delete($id)) {
     http_response_code(200);
     echo json_encode([
         'errors' => [],

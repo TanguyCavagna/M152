@@ -1,12 +1,20 @@
 <?php
+/**
+ * @filesource PostController.php
+ * @brief Controlleur pour mes posts
+ * @author Tanguy Cavagna <tanguy.cvgn@eduge.ch>
+ * @date 2020-02-09
+ * @version 1.0.0
+ */
 
 namespace App\Controllers;
 
 use App\Controllers\MediaController;
+use App\Controllers\RelationController;
 
 class PostController extends EDatabaseController {
     /**
-     * Initialise tous les champs de la table `user`
+     * Initialise tous les champs de la table `post`
      */
     function __construct() {
         $this->tableName = 'post';
@@ -14,11 +22,30 @@ class PostController extends EDatabaseController {
         $this->fieldComment = 'commentary';
         $this->fieldCreation = 'creationDate';
         $this->fieldModification = 'modificationDate';
+
+        $this->mediaController = new MediaController();
+        $this->relationController = new RelationController();
     }
 
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ PRIVATE FUNCTIONS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    /**
+     * Est-ce-que le poste à 1 ou plusieurs médias
+     *
+     * @param integer $idPost
+     * @return boolean
+     */
+    private function HasMedia(int $idPost): bool {
+        return $this->relationController->PostOwnMedia($idPost);
+    }
 
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ PUBLIC FUNCTIONS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    /**
+     * Insère un nouveau poste
+     *
+     * @param string $comment Commentaire du poste
+     * @param array $medias Liste des médias venant de la supervariables $_FILES
+     * @return boolean
+     */
     public function Insert(string $comment, array $medias = null): bool {
         $insertQuery = <<<EX
             INSERT INTO `{$this->tableName}`(`{$this->fieldComment}`, `{$this->fieldCreation}`, `{$this->fieldModification}`)
@@ -61,18 +88,38 @@ class PostController extends EDatabaseController {
         }
     }
 
+    /**
+     * Récupère tout les postes
+     *
+     * @return array|null
+     */
     public function GetAll(): ?array {
         $selectQuery = <<<EX
-            SELECT 	{$this->tableName}.{$this->fieldId},
-                    {$this->tableName}.{$this->fieldComment},
-                    {$this->tableName}.{$this->fieldCreation},
-                    group_concat(media.nameMedia ORDER BY media.idMedia) AS medias,
-                    group_concat(media.typeMedia ORDER BY media.idMedia) AS `types`
-            FROM post
-            JOIN own ON own.idPost = post.idPost
-            JOIN media ON media.idMedia = own.idMedia
-            WHERE own.idPost = post.idPost
-            GROUP BY post.idPost
+            (
+                SELECT 	{$this->tableName}.{$this->fieldId},
+                        {$this->tableName}.{$this->fieldComment},
+                        {$this->tableName}.{$this->fieldCreation},
+                        group_concat(media.nameMedia ORDER BY media.idMedia) AS medias,
+                        group_concat(media.typeMedia ORDER BY media.idMedia) AS `types`
+                FROM {$this->tableName}
+                JOIN own ON own.idPost = {$this->tableName}.{$this->fieldId}
+                JOIN media ON media.idMedia = own.idMedia
+                GROUP BY {$this->fieldId}
+            )
+            UNION
+            (
+                SELECT 	{$this->tableName}.{$this->fieldId}, 
+                        {$this->tableName}.{$this->fieldComment}, 
+                        {$this->tableName}.{$this->fieldCreation}, 
+                        null as medias, 
+                        null as `types` 
+                FROM {$this->tableName}
+                WHERE {$this->tableName}.{$this->fieldId} NOT IN (
+                    SELECT own.idPost
+                    FROM own
+                )
+                GROUP BY {$this->fieldId}
+            ) ORDER BY {$this->fieldId}
         EX;
 
         try {
@@ -94,12 +141,12 @@ class PostController extends EDatabaseController {
     }
 
     /**
-     * Delete a post with is id
+     * Supprime un poste
      *
      * @param integer $id
      * @return boolean
      */
-    public function DeletePost(int $id): bool {
+    public function Delete(int $idPost): bool {
         $deleteQuery = <<<EX
             DELETE FROM {$this->tableName}
             WHERE {$this->tableName}.{$this->fieldId} = :id
@@ -108,8 +155,15 @@ class PostController extends EDatabaseController {
         try {
             $this::beginTransaction();
 
+            if ($this->HasMedia($idPost)) {
+                if (!$this->mediaController->Delete($idPost)) {
+                    $this::rollback();
+                    return false;
+                }
+            }
+
             $requestDelete = $this::getInstance()->prepare($deleteQuery);
-            $requestDelete->bindParam(':id', $id);
+            $requestDelete->bindParam(':id', $idPost);
             $requestDelete->execute();
 
             $this::commit();
