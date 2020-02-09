@@ -44,46 +44,64 @@ $posts = $postController->GetAll();
                 </div>
             </div>
 
-            <?php foreach ($posts as $post): 
-                $medias = explode(',', $post['medias']); 
-                $types = explode(',', $post['types']); 
-            ?>
-                <div class="card post">
-                    <div class="medias">
-                        <?php foreach($medias as $key => $media): ?>
-                            <div class="media">
-                                <?php if (strpos($types[$key], 'image') !== false): ?>
-                                    <img src="../uploads/<?= $media ?>" alt="" class="card-top">
-                                <?php elseif (strpos($types[$key], 'audio') !== false): ?>
-                                    <audio controls>
-                                        <source src="../uploads/<?= $media ?>" type="<?= $types[$key] ?>">
-                                    </audio>
-                                <?php elseif (strpos($types[$key], 'video') !== false): ?>
-                                    <video loop autoplay muted>
-                                        <source src="../uploads/<?= $media ?>" type="<?= $types[$key] ?>">
-                                    </video>
-                                <?php endif; ?>
-                            </div>
-                        <?php endforeach; ?>
-                    </div>
-                    <div class="card-body">
-                        <p class="post-comment"><?= $post['commentary'] ?></p>
-                    </div>
-
-                    <div class="card-footer">
-                        <button>Supprimer</button>
-                        <button>Modifer</button>
-                    </div>
-                </div>
-            <?php endforeach; ?>
+            <div class="posts"></div>
         </section>
         <!-- ============= END POSTS ============= -->
     </main>
 
-    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
     <script src="../js/search.js" defer></script>
+    <script src="../js/post.js" type="module" defer></script>
+    <script defer>
+        $(document).ready(() => {
+            const postsDOM = document.querySelector('.posts');
+
+            fetch('./getAll.php')
+            .then(response => {
+                return response.json();
+            })
+            .then(json => {
+                const posts = json.posts;
+
+                posts.forEach(post => {
+                    $(postsDOM).append(`<my-post comment="${post.commentary}" medias="${post.medias}" types="${post.types}" id="${post.idPost}"></my-post>`);
+                });
+
+                const shadowPost = document.querySelector('my-post').shadowRoot;
+                const deleteBtn = shadowPost.querySelector('.delete');
+                const editBtn = shadowPost.querySelector('.edit');
+                const id = $(deleteBtn).parent().parent()[0].dataset.id;
+
+                deleteBtn.addEventListener('click', () => {
+                    let formData = new FormData();
+                    formData.append('id', id);
+
+                    const init = {
+                        method: 'POST',
+                        headers: {
+                            'Accept': 'application/json',
+                        },
+                        body: formData
+                    };
+
+                    fetch('./deletePost.php', init)
+                    .then(response => {
+                        return response.json();
+                    })
+                    .then(json => {
+                        console.log(json);
+                    })
+                    .catch(err => {
+                        console.error(err);
+                    });
+                });
+            })
+            .catch(err => {
+                console.error(err);
+            })
+        });
+    </script>
 </body>
 
 </html>

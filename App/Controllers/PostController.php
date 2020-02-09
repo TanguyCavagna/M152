@@ -63,7 +63,8 @@ class PostController extends EDatabaseController {
 
     public function GetAll(): ?array {
         $selectQuery = <<<EX
-            SELECT 	{$this->tableName}.{$this->fieldComment},
+            SELECT 	{$this->tableName}.{$this->fieldId},
+                    {$this->tableName}.{$this->fieldComment},
                     {$this->tableName}.{$this->fieldCreation},
                     group_concat(media.nameMedia ORDER BY media.idMedia) AS medias,
                     group_concat(media.typeMedia ORDER BY media.idMedia) AS `types`
@@ -89,6 +90,34 @@ class PostController extends EDatabaseController {
         } catch (\PDOException $e) {
             $this::rollback();
             return null;
+        }
+    }
+
+    /**
+     * Delete a post with is id
+     *
+     * @param integer $id
+     * @return boolean
+     */
+    public function DeletePost(int $id): bool {
+        $deleteQuery = <<<EX
+            DELETE FROM {$this->tableName}
+            WHERE {$this->tableName}.{$this->fieldId} = :id
+        EX;
+
+        try {
+            $this::beginTransaction();
+
+            $requestDelete = $this::getInstance()->prepare($deleteQuery);
+            $requestDelete->bindParam(':id', $id);
+            $requestDelete->execute();
+
+            $this::commit();
+
+            return true;
+        } catch (\PDOExeption $e) {
+            $this::rollback();
+            return false;
         }
     }
 }
