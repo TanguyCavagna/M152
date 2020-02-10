@@ -1,7 +1,7 @@
 /**
  * ShadowDOM pour les posts. Cela permet de gérer plus facielement le comportement des posts et évite la surcharge d'infos dans le HTML
  */
-class Post extends HTMLElement {
+class PostModule extends HTMLElement {
     constructor() {
         super();
         const id = this.getAttribute('id') || -1;
@@ -73,6 +73,14 @@ class Post extends HTMLElement {
                             $(postsDOM).append(`<my-post comment="${post.comment}" ${mediaNames != '' ? 'medias="' + mediaNames + '"': ''} ${mediaTypes != '' ? 'types="' + mediaTypes + '"': ''} id="${post.id}"></my-post>`);
                         });
                     });
+                } else if (response.status === 422) { // Id du poste vide
+                    console.log("Id du poste vide");
+                } else if (response.status === 415) { // Id du poste non entier
+                    console.log("Id du poste non entier");
+                } else if (response.status !== 0) {
+                    console.log(`Erreur HTTP ${xhr.status}. Veuillez réessayer.`);
+                } else {
+                    console.log('Erreur inconnue. Veuillez réessayer.');
                 }
             })
             .catch(err => {
@@ -117,18 +125,30 @@ class Post extends HTMLElement {
                         return response.json();
                     })
                     .then(json => {
-                        comment.innerHTML = textarea.value;
+                        if (response.status === 200) {
+                            comment.innerHTML = textarea.value;
 
-                        comment.classList.remove('hide');
-                        textarea.classList.add('hide');
-                        editBtn.classList.remove('hide');
-                        validBtn.classList.add('hide');
-            
-                        for (let index = 0; index < deleteMediaBtns.length; index++) {
-                            const element = deleteMediaBtns[index];
-                            element.classList.add('hide');
+                            comment.classList.remove('hide');
+                            textarea.classList.add('hide');
+                            editBtn.classList.remove('hide');
+                            validBtn.classList.add('hide');
+                
+                            for (let index = 0; index < deleteMediaBtns.length; index++) {
+                                const element = deleteMediaBtns[index];
+                                element.classList.add('hide');
+                            }
+                        } else if (response.status !== 0) {
+                            console.log(`Erreur HTTP ${xhr.status}. Veuillez réessayer.`);
+                        } else {
+                            console.log('Erreur inconnue. Veuillez réessayer.');
                         }
                     });
+                } else if (response.status === 422) { // Commentaire vide
+                    console.log("Commentaire vide");
+                } else if (response.status !== 0) {
+                    console.log(`Erreur HTTP ${xhr.status}. Veuillez réessayer.`);
+                } else {
+                    console.log('Erreur inconnue. Veuillez réessayer.');
                 }
             })
             .catch(err => {
@@ -165,6 +185,12 @@ class Post extends HTMLElement {
                         .then(json => {
                             mediaContainer.parentNode.removeChild(mediaContainer);
                         });
+                    } else if (response.status === 422) { // L'id du media est vide
+                        console.log("L'id du media est vide");
+                    } else if (response.status !== 0) {
+                        console.log(`Erreur HTTP ${xhr.status}. Veuillez réessayer.`);
+                    } else {
+                        console.log('Erreur inconnue. Veuillez réessayer.');
                     }
                 })
                 .catch(err => {
@@ -345,7 +371,7 @@ class Post extends HTMLElement {
 }
 
 try {
-    customElements.define('my-post', Post);
+    customElements.define('my-post', PostModule);
 } catch (e) {
     if (e instanceof DOMException) {
         console.error('DOMException : ', e);
