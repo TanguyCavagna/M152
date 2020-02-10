@@ -55,7 +55,22 @@ class Post extends HTMLElement {
                         const posts = json.posts;
 
                         posts.forEach(post => {
-                            $(postsDOM).append(`<my-post comment="${post.commentary}" medias="${post.medias}" types="${post.types}" id="${post.idPost}"></my-post>`);
+                            let mediaNames = '';
+                            let mediaTypes = '';
+
+                            // Création d'une string concaténant les noms et types des médias
+                            if (post.medias !== null) {
+                                post.medias.forEach(media => {
+                                    mediaNames += `${media.name},`;
+                                    mediaTypes += `${media.type},`;
+                                });
+                            }
+
+                            // Suppression de la dernière virgule
+                            mediaNames = mediaNames.substring(0, mediaNames.length - 1);
+                            mediaTypes = mediaTypes.substring(0, mediaTypes.length - 1);
+
+                            $(postsDOM).append(`<my-post comment="${post.comment}" ${mediaNames != '' ? 'medias="' + mediaNames + '"': ''} ${mediaTypes != '' ? 'types="' + mediaTypes + '"': ''} id="${post.id}"></my-post>`);
                         });
                     });
                 }

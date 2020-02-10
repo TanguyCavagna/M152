@@ -59,6 +59,7 @@ class MediaController extends EDatabaseController {
             return null;
         }
     }
+    
     /**
      * Supprime le média du serveur
      *
@@ -190,6 +191,12 @@ class MediaController extends EDatabaseController {
         }
     }
 
+    /**
+     * Suppression d'un média avec son nom
+     *
+     * @param string $nameMedia
+     * @return boolean
+     */
     public function DeleteByName(string $nameMedia): bool {
         $deleteQuery = <<<EX
             DELETE FROM {$this->tableName}

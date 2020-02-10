@@ -9,10 +9,23 @@
 
 namespace App\Controllers;
 
+// Models
+use App\Models\Post;
+use App\Models\Media;
+
+// Controlleurs
 use App\Controllers\MediaController;
 use App\Controllers\RelationController;
 
 class PostController extends EDatabaseController {
+    public static $TOTAL_UPLOAD_MAX_SIZE = 70e6;
+    public static $SINGLE_UPLOAD_MAX_SIZE = 3e6;
+    public static $ALLOWED_TYPES = [
+        'image/',
+        'audio/',
+        'video/',
+    ];
+
     /**
      * Initialise tous les champs de la table `post`
      */
@@ -53,7 +66,6 @@ class PostController extends EDatabaseController {
         EX;
 
         $creationTimestamp = date("Y-m-d H:i:s");
-        $mediaController = new MediaController();
 
         try {
             $this::beginTransaction();
@@ -72,7 +84,7 @@ class PostController extends EDatabaseController {
                     $file_extension = '.' . pathinfo($file_name, PATHINFO_EXTENSION);
                     $final_file_name = uniqid() . $file_extension;
                     
-                    if (!$mediaController->Insert($lastInsertId, $final_file_name, $medias['type'][$i], $medias['tmp_name'][$i], $file_extension)) {
+                    if (!$this->mediaController->Insert($lastInsertId, $final_file_name, $medias['type'][$i], $medias['tmp_name'][$i], $file_extension)) {
                         $this::rollBack();
                         return false;
                     }
@@ -91,7 +103,7 @@ class PostController extends EDatabaseController {
     /**
      * Récupère tout les postes
      *
-     * @return array|null
+     * @return array|null Liste de postes
      */
     public function GetAll(): ?array {
         $selectQuery = <<<EX
@@ -99,6 +111,7 @@ class PostController extends EDatabaseController {
                 SELECT 	{$this->tableName}.{$this->fieldId},
                         {$this->tableName}.{$this->fieldComment},
                         {$this->tableName}.{$this->fieldCreation},
+                        {$this->tableName}.{$this->fieldModification},
                         group_concat(media.nameMedia ORDER BY media.idMedia) AS medias,
                         group_concat(media.typeMedia ORDER BY media.idMedia) AS `types`
                 FROM {$this->tableName}
@@ -111,6 +124,7 @@ class PostController extends EDatabaseController {
                 SELECT 	{$this->tableName}.{$this->fieldId}, 
                         {$this->tableName}.{$this->fieldComment}, 
                         {$this->tableName}.{$this->fieldCreation}, 
+                        {$this->tableName}.{$this->fieldModification}, 
                         null as medias, 
                         null as `types` 
                 FROM {$this->tableName}
@@ -129,9 +143,25 @@ class PostController extends EDatabaseController {
 
             $requestSelect = $this::getInstance()->prepare($selectQuery);
             $requestSelect->execute();
-            $results = $requestSelect->fetchAll(\PDO::FETCH_ASSOC);
+            $temp = $requestSelect->fetchAll(\PDO::FETCH_ASSOC);
 
             $this::commit();
+
+            // Encaplusation des posts
+            foreach ($temp as $post) {
+                $medias = [];
+
+                $mediaNames = explode(',', $post['medias']);
+                $mediaTypes = explode(',', $post['types']);
+
+                // Création de la liste des médias apparetenant au poste
+                foreach ($mediaNames as $key => $mediaName) {
+                    array_push($medias, new Media($mediaName, $mediaTypes[$key]));
+                }
+
+                // Création de la liste des postes
+                array_push($results, new Post($post['idPost'], $post['commentary'], $post['creationDate'], $post['modificationDate'], $medias));
+            }
 
             return $results;
         } catch (\PDOException $e) {

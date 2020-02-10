@@ -6,13 +6,6 @@ require __DIR__ . '/../../vendor/autoload.php';
 use \App\Controllers\PostController;
 
 define('TARGET_DIR', 'uploads/');
-define('TOTAL_MAX_SIZE', 70000000); // byte
-define('SINGLE_MAX_SIZE', 3000000); // byte
-define('ALLOWED_TYPES', [
-    'image/',
-    'audio/',
-    'video/',
-]);
 
 $postController = new PostController();
 
@@ -38,19 +31,19 @@ if ($files !== null) {
     // Test de la taille maximum par fichier et total ainsi que le type de fichier
     for ($i = 0; $i < count($files['tmp_name']); $i++) {
         // Taille
-        if ($files['size'][$i] > SINGLE_MAX_SIZE || $files['error'][$i] == 1) {
+        if ($files['size'][$i] > PostController::$SINGLE_UPLOAD_MAX_SIZE || $files['error'][$i] == 1) {
             $size_error = true;
         }
         $all_files_size += $files['size'][$i];
 
         // Type
         $type = explode('/', $files['type'][$i])[0] . '/';
-        if (!in_array($type, ALLOWED_TYPES)) {
+        if (!in_array($type, PostController::$ALLOWED_TYPES)) {
             $file_type_error = true;
         }
     }
 
-    if ($all_files_size > TOTAL_MAX_SIZE) {
+    if ($all_files_size > PostController::$TOTAL_UPLOAD_MAX_SIZE) {
         $size_error = true;
     }
 
