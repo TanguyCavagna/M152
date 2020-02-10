@@ -95,6 +95,34 @@ class RelationController extends EDatabaseController {
     }
 
     /**
+     * Supprime une relation avec l'id du media
+     *
+     * @param integer $idMedia
+     * @return boolean
+     */
+    public function DeleteMedia(int $idMedia): bool {
+        $deleteQuery = <<<EX
+            DELETE FROM own
+            WHERE idMedia = :idMedia
+        EX;
+
+        try {
+            $this::beginTransaction();
+
+            $requestDelete = $this::getInstance()->prepare($deleteQuery);
+            $requestDelete->bindParam(':idMedia', $idMedia);
+            $requestDelete->execute();
+
+            $this::commit();
+
+            return true;
+        } catch (\PDOException $e) {
+            $this::rollback();
+            return false;
+        }
+    }
+
+    /**
      * Est-ce qu'un poste à des médias
      *
      * @param integer $idPost

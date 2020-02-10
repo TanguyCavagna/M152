@@ -2,3 +2,4 @@
 config
 /.vscode/
 /tmp_files/
+/public/uploads/*.*

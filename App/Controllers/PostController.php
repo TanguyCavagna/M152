@@ -174,4 +174,35 @@ class PostController extends EDatabaseController {
             return false;
         }
     }
+
+    /**
+     * Met à jour le commentaire d'un poste
+     *
+     * @param integer $idPost
+     * @param string $comment
+     * @return boolean
+     */
+    public function UpdateComment(int $idPost, string $comment): bool {
+        $updateQuery = <<<EX
+            UPDATE {$this->tableName}
+            SET {$this->tableName}.{$this->fieldComment} = :comment
+            WHERE {$this->tableName}.{$this->fieldId} = :idPost
+        EX;
+        
+        try {
+            $this::beginTransaction();
+
+            $requestUpdate = $this::getInstance()->prepare($updateQuery);
+            $requestUpdate->bindParam(':comment', $comment);
+            $requestUpdate->bindParam(':idPost', $idPost);
+            $requestUpdate->execute();
+
+            $this::commit();
+
+            return true;
+        } catch (\Exception $e) {
+            $this::rollback();
+            return false;
+        }
+    }
 }
