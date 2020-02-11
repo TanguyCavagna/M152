@@ -1,3 +1,11 @@
+/**
+ * @filesource style.scss
+ * @brief Feuille de style de mon application
+ * @author Tanguy Cavagna <tanguy.cvgn@eduge.ch>
+ * @date 2020-02-11
+ * @version 1.0.0
+ */
+
 @import "typography";
 @import "palette";
 @import "sizes";
@@ -214,36 +222,11 @@ main:not(.add-post) {
 // Posts
 //=========================
 .post {
-    border-radius: 0;
+    margin-top: 30px;
+}
 
-    & + .post {
-        margin-top: 30px;
-    }
-}
-.post { border-radius: 0; }
-.post .medias {
-    padding: 0;
-}
-.post .medias .media {
-    padding: 0;
-    width: 100%;
-    justify-content: center;
-
-    & + .media { margin-top: 10px; }
-}
-.post .medias .media audio {
-    width: 95%;
-    border-radius: 15px;
-}
-.post .big-title {
-    font-size: 2rem;
-    font-family: $f-gotham-ultra;
-}
-.post .post-comment {
-    margin: 0;
-    font-size: 1.2rem;
-    font-family: $f-gotham-light;
-}
+// Add Post
+//=========================
 .add-post {
     width: 100%;
     padding-top: 30px;
@@ -251,28 +234,28 @@ main:not(.add-post) {
     flex-direction: column;
     align-items: center;
 }
-.add-post .add-post__body {
+.add-post__body {
     display: inline-flex;
     justify-content: space-between;
     width: 100%;
     margin-bottom: 0;
     background-color: $white;
 }
-.add-post .add-post__body textarea {
+.add-post__body textarea {
     width: calc(100% - 100px);
     height: 100px;
     border: none;
     font-family: $f-gotham-light;
     resize: none;
 }
-.add-post .add-post__body .add-post__user-img {
+.add-post__body .add-post__user-img {
     width: 100px;
     height: 100px;
     display: flex;
     justify-content: center;
     align-items: center;
 }
-.add-post .add-post__body .add-post__user-img img {
+.add-post__body .add-post__user-img img {
     border-radius: 50%;
     height: 70%;
 }
@@ -281,7 +264,7 @@ main:not(.add-post) {
     justify-content: left;
     align-items: center;
 }
-.add-post .add-post__options {
+.add-post__options {
     margin-top: 0;
     height: 50px;
     width: 100%;
@@ -291,7 +274,7 @@ main:not(.add-post) {
     align-items: center;
     justify-content: space-between;
 }
-.add-post .add-post__options .inserts-element {
+.add-post__options .inserts-element {
     width: 30px;
     height: 30px;
     background: $blue;
@@ -304,25 +287,40 @@ main:not(.add-post) {
         margin-left: 20px;
     }
 }
-.add-post .add-post__options .add-post__image {
+.add-post__options .add-post__image {
     -webkit-mask-image: url(../images/icon-image.svg);
 }
-.add-post .add-post__options .add-post__video {
+.add-post__options .add-post__video {
     -webkit-mask-image: url(../images/icon-video.svg);
 }
-.add-post .add-post__options .add-post__audio {
+.add-post__options .add-post__audio {
     -webkit-mask-image: url(../images/icon-audio.svg);
 }
-.add-post .add-post__submit {
+.add-post__submit {
     padding-right: 20px;
 }
 
-// Post images
+// Add post images
 //=========================
+.alerts {
+    position: absolute;
+    width: 100%;
+    top: 0;
+    left: 0;
+}
+.alert {
+    position: absolute;
+    width: 20%;
+    left: 40%; // 50% - width / 2
+    top: 0;
+    z-index: 10;
+    border-radius: 0;
+    text-align: center;
+}
 .progress {
     width: 0;
     height: 7px;
-    background-color: red;
+    background-color: $blue;
     margin-bottom: 0;
     border-radius: 0;
 }
@@ -504,16 +502,6 @@ main:not(.add-post) {
     color: #fff;
 }
 
-// Modal
-//=========================
-.modal-content {
-    border-radius: 0;
-}
-.modal-header,
-.modal-footer {
-    border: none;
-}
-
 // Buttons
 //=========================
 .btn-FB {
@@ -528,6 +516,12 @@ main:not(.add-post) {
 .btn-FB-secondary {
     background-color: #777;
     color: $white;
+}
+
+// Utilities
+//=========================
+.hide {
+    display: none;
 }
 
 // Medias

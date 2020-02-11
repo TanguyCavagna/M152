@@ -1,10 +1,19 @@
 <?php
+/**
+ * @filesource MediaController.php
+ * @brief Controlleur pour mes médias
+ * @author Tanguy Cavagna <tanguy.cvgn@eduge.ch>
+ * @date 2020-02-09
+ * @version 1.0.0
+ */
 
 namespace App\Controllers;
 
+use App\Controllers\RelationController;
+
 class MediaController extends EDatabaseController {
     /**
-     * Initialise tous les champs de la table `user`
+     * Initialise tous les champs de la table `media`
      */
     function __construct() {
         $this->tableName = 'media';
@@ -14,38 +23,86 @@ class MediaController extends EDatabaseController {
         $this->fieldCreation = 'creationDate';
         $this->fieldModification = 'modificationDate';
 
-        $this->tableLinkName = 'own';
-        $this->tableLinkIdPost = 'idPost';
-        $this->tableLinkIdMedia = 'idMedia';
+        $this->relationController = new RelationController();
 
         $this->targetDir = '../../public/uploads/';
     }
 
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ PRIVATE FUNCTIONS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    private function LinkToPost(int $postId, int $mediaId) {
-        $linkQuery = <<<EX
-            INSERT INTO `{$this->tableLinkName}`(`{$this->tableLinkIdPost}`, `{$this->tableLinkIdMedia}`)
-            VALUES(:idPost, :idMedia)
+    /**
+     * Récupère l'id d'un média avec son nom
+     *
+     * @param string $nameMedia
+     * @return integer|null
+     */
+    private function GetIdByName(string $nameMedia): ?int {
+        $selectQuery = <<<EX
+            SELECT {$this->tableName}.{$this->fieldId}
+            FROM {$this->tableName}
+            WHERE {$this->tableName}.{$this->fieldName} = :nameMedia
+        EX;
+
+        try {
+            $result = -1;
+            $this::beginTransaction();
+
+            $requestSelect = $this::getInstance()->prepare($selectQuery);
+            $requestSelect->bindParam(':nameMedia', $nameMedia);
+            $requestSelect->execute();
+            $result = $requestSelect->fetch(\PDO::FETCH_ASSOC)['idMedia'];
+
+            $this::commit();
+
+            return $result;
+        } catch (\PDOException $e) {
+            $this::rollback();
+            return null;
+        }
+    }
+    
+    /**
+     * Supprime le média du serveur
+     *
+     * @param integer $idMedia
+     * @return boolean
+     */
+    private function MoveMediaToTrash(int $idMedia): bool {
+        $selectFileName = <<<EX
+            SELECT {$this->tableName}.{$this->fieldName}
+            FROM {$this->tableName}
+            WHERE {$this->tableName}.{$this->fieldId} = :idMedia
         EX;
 
         try {
             $this::beginTransaction();
 
-            $requestLink = $this::getInstance()->prepare($linkQuery);
-            $requestLink->bindParam(':idPost', $postId);
-            $requestLink->bindParam(':idMedia', $mediaId);
-            $requestLink->execute();
+            $requestSelect = $this::getInstance()->prepare($selectFileName);
+            $requestSelect->bindParam(':idMedia', $idMedia);
+            $requestSelect->execute();
+            $fileName = $requestSelect->fetch(\PDO::FETCH_ASSOC);
+
+            unlink($this->targetDir . $fileName['nameMedia']);
 
             $this::commit();
-            return true;            
-        } catch (\PDOException $e) {
-            $this::rollBack();
 
+            return true;
+        } catch (\PDOException $e) {
+            $this::rollback();
             return false;
         }
     }
 
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ PUBLIC FUNCTIONS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    /**
+     * Ajoute un nouveau média
+     *
+     * @param integer $postId Id du poste lié au média
+     * @param string $name Nom du média
+     * @param string $type Type du média
+     * @param string $tmp_name Nom temporaire du média
+     * @param string $file_extension Extension du média
+     * @return boolean
+     */
     public function Insert(int $postId, string $name, string $type, string $tmp_name, string $file_extension): bool {
         $insertQuery = <<<EX
             INSERT INTO `{$this->tableName}`(`{$this->fieldType}`, `{$this->fieldName}`, `{$this->fieldCreation}`, `{$this->fieldModification}`)
@@ -67,7 +124,7 @@ class MediaController extends EDatabaseController {
             $lastInsertId = $this::getInstance()->lastInsertId();
 
             if (move_uploaded_file($tmp_name, $this->targetDir . $name)) {
-                if (!$this->LinkToPost($postId, $lastInsertId)) {
+                if (!$this->relationController->Insert($postId, $lastInsertId)) {
                     $this::rollBack();
                     return false;
                 }
@@ -82,6 +139,104 @@ class MediaController extends EDatabaseController {
         } catch (\PDOException $e) {
             $this::rollBack();
 
+            return false;
+        }
+    }
+
+    /**
+     * Supprime un média
+     *
+     * @param integer $idPost Id du poste lié au média
+     * @return boolean
+     */
+    public function Delete(int $idPost): bool {
+        $deleteQuery = <<<EX
+            DELETE FROM {$this->tableName}
+            WHERE {$this->tableName}.{$this->fieldId} = :idMedia
+        EX;
+
+        try {
+            $this::beginTransaction();
+
+            $mediaToDelete = $this->relationController->Delete($idPost);
+
+            if ($mediaToDelete !== null) {
+                foreach ($mediaToDelete as $media) {
+                    $idMedia = $media['idMedia'];
+                    
+                    $this::beginTransaction();
+
+                    if ($this->MoveMediaToTrash($idMedia)) {
+                        $requestDelete = $this::getInstance()->prepare($deleteQuery);
+                        $requestDelete->bindParam(':idMedia', $idMedia);
+                        $requestDelete->execute();
+                    } else {
+                        $this::rollback();
+                        return false;
+                    }
+
+                    $this::commit();
+                }
+            } else {
+                $this::rollback();
+                return false;
+            }
+
+            $this::commit();
+
+            return true;
+        } catch (\PDOException $e) {
+            $this::rollback();
+            return false;
+        }
+    }
+
+    /**
+     * Suppression d'un média avec son nom
+     *
+     * @param string $nameMedia
+     * @return boolean
+     */
+    public function DeleteByName(string $nameMedia): bool {
+        $deleteQuery = <<<EX
+            DELETE FROM {$this->tableName}
+            WHERE {$this->tableName}.{$this->fieldName} = :nameMedia
+        EX;
+
+        try {
+            $this::beginTransaction();
+
+            $idMedia = $this->GetIdByName($nameMedia);
+            try {
+                $idMedia = intval($idMedia);
+            } catch (\Exception $e) {
+                $this::rollback();
+                return false;
+            }
+
+            if($this->relationController->DeleteMedia($idMedia)) {
+                $this::beginTransaction();
+
+                if ($this->MoveMediaToTrash($idMedia)) {
+                    $requestDelete = $this::getInstance()->prepare($deleteQuery);
+                    $requestDelete->bindParam(':nameMedia', $nameMedia);
+                    $requestDelete->execute();
+                } else {
+                    $this::rollback();
+                    return false;
+                }
+
+                $this::commit();
+            } else {
+                $this::rollback();
+                return false;
+            }
+
+            $this::commit();
+
+            return true;
+        } catch (\PDOException $e) {
+            $this::rollback();
             return false;
         }
     }

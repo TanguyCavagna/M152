@@ -1,7 +1,7 @@
 <?php
 /**
- * @filesource updloadPost.php
- * @brief Permet de metter en ligne un poste
+ * @filesource updateMediasOfPost.php
+ * @brief Permet d'ajouter des médias dans un poste
  * @author Tanguy Cavagna <tanguy.cvgn@eduge.ch>
  * @date 2020-02-11
  * @version 1.0.0
@@ -12,29 +12,26 @@ header('Content-Type: application/json');
 require __DIR__ . '/../../vendor/autoload.php';
 
 use \App\Controllers\PostController;
+use \App\Controllers\MediaController;
 
 define('TARGET_DIR', 'uploads/');
 
-$postController = new PostController();
+$mediaController = new MediaController();
 
 $size_error = false;
 $file_type_error = false;
 $all_files_size = 0;
 
-$post_body = filter_input(INPUT_POST, 'post-body', FILTER_SANITIZE_STRING, FILTER_NULL_ON_FAILURE);
+$idPost = filter_input(INPUT_POST, 'idPost');
+
+if ($idPost === "null") {
+    $idPost = null;
+}
 
 if (count($_FILES) > 0) {
     $files = $_FILES['files'];
 } else {
     $files = null;
-}
-
-if (empty($post_body)) {
-    http_response_code(422);
-    echo json_encode([
-        'errors' => 'Le corps du post doit impérativement être présent.'
-    ]);
-    exit();
 }
 
 if ($files !== null) {
@@ -74,17 +71,24 @@ if ($files !== null) {
     }
 }
 
-// Ajout du nouveau poste
-if ($postController->Insert($post_body, $files)) {
+if (!$size_error && !$file_type_error) {
+    for ($i = 0; $i < count($files['tmp_name']); $i++) {
+        $file_name = $files['name'][$i];
+        $file_extension = '.' . pathinfo($file_name, PATHINFO_EXTENSION);
+        $final_file_name = uniqid() . $file_extension;
+        
+        if (!$mediaController->Insert($idPost, $final_file_name, $files['type'][$i], $files['tmp_name'][$i], $file_extension)) {
+            http_response_code(200);
+            echo json_encode([
+                'errors' => `Une erreur est survenue lors de l\'ajout du media ${file_name}. Il n'a donc pas été ajouter.`
+            ]);
+            exit();
+        }
+    }
+
     http_response_code(200);
     echo json_encode([
         'errors' => []
-    ]);
-    exit();
-} else {
-    http_response_code(200);
-    echo json_encode([
-        'errors' => 'Une erreur est survenue lors de l\'ajout du post.'
     ]);
     exit();
 }

@@ -1,12 +1,3 @@
-<?php
-require __DIR__ . '/../../vendor/autoload.php';
-
-use App\Controllers\PostController;
-
-$postController = new PostController();
-
-$posts = $postController->GetAll();
-?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -22,6 +13,8 @@ $posts = $postController->GetAll();
 
 <body>
     <?php require_once '../includes/nav.php'; ?>
+
+    <div class="alerts"></div>
 
     <main class="row">
         <!-- ============= START INFOS ============= -->
@@ -44,46 +37,131 @@ $posts = $postController->GetAll();
                 </div>
             </div>
 
-            <?php foreach ($posts as $post): 
-                $medias = explode(',', $post['medias']); 
-                $types = explode(',', $post['types']); 
-            ?>
-                <div class="card post">
-                    <div class="medias">
-                        <?php foreach($medias as $key => $media): ?>
-                            <div class="media">
-                                <?php if (strpos($types[$key], 'image') !== false): ?>
-                                    <img src="../uploads/<?= $media ?>" alt="" class="card-top">
-                                <?php elseif (strpos($types[$key], 'audio') !== false): ?>
-                                    <audio controls>
-                                        <source src="../uploads/<?= $media ?>" type="<?= $types[$key] ?>">
-                                    </audio>
-                                <?php elseif (strpos($types[$key], 'video') !== false): ?>
-                                    <video loop autoplay muted>
-                                        <source src="../uploads/<?= $media ?>" type="<?= $types[$key] ?>">
-                                    </video>
-                                <?php endif; ?>
-                            </div>
-                        <?php endforeach; ?>
-                    </div>
-                    <div class="card-body">
-                        <p class="post-comment"><?= $post['commentary'] ?></p>
-                    </div>
-
-                    <div class="card-footer">
-                        <button>Supprimer</button>
-                        <button>Modifer</button>
-                    </div>
-                </div>
-            <?php endforeach; ?>
+            <div class="posts"></div>
         </section>
         <!-- ============= END POSTS ============= -->
     </main>
 
-    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
     <script src="../js/search.js" defer></script>
+    <script src="../js/post.js" type="module" defer></script>
+    <script src="../js/upload.js" defer></script>
+    <script defer>
+        const postsDOM = document.querySelector('.posts');
+
+        //==================================================================================================
+        // Fonctions
+        //==================================================================================================
+
+        /**
+         * Ajout le formulaire d'ajout de media dans le poste donner via son id
+         */
+        function createEditForm(postId) {
+            const newPost = document.querySelector(`.post[data-id="${postId}"]`);
+
+            $(newPost).prepend(`
+            <form class="post-form hide" action="./addMediasInPost.php" method="POST" enctype="multipart/form-data">
+                <div class="form-group file-upload">
+                    <div class="file-upload-infos">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M7 11v13h2v-5h2v3h2v-7h2v9h2v-13h6l-11-11-11 11z"/></svg>
+                        <h2>Ajouter des fichiers</h2>
+                        <p>Vous pouvez ajouter un fichier en le glissant dans cette zone ou en utilisant les boutons.</p>
+                    </div>
+                    <ul class="uploaded-files"></ul>
+                </div>
+                <div class="form-group add-post__options">
+                    <span class="add-post__options-inserts open-file-dialog-buttons">
+                        <span class="inserts-element add-post__image" data-accept="image/*"></span>
+                        <span class="inserts-element add-post__video" data-accept="video/*"></span>
+                        <span class="inserts-element add-post__audio" data-accept="audio/*"></span>
+                    </span>
+                </div>
+            </form>
+            `);
+
+            const myPost = newPost.querySelector('my-post');
+            const editBtn = myPost.shadowRoot.querySelector('.edit');
+            const validBtn = myPost.shadowRoot.querySelector('.valid');
+
+            editBtn.addEventListener('click', e => {
+                newPost.querySelector('.post-form').classList.remove('hide'); // Affiche le formulaire
+
+                // Ré initialisation des variables nécessaire au script d'upload de fichiers
+                form = document.querySelector('.post-form:not(.hide)');
+                dropZone = form.querySelector('.file-upload');
+                progressBar = form.querySelector('.progress');
+
+                // Remise en place des évènements du formulaire
+                setupFileButtons();
+                setupFormSubmission();
+                setupDragDropEvent();
+            });
+
+            validBtn.addEventListener('click', e => {
+                submitForm(postId);
+
+                newPost.querySelector('.post-form').classList.add('hide'); // Cache le formulaire
+            });
+        }
+
+        /**
+         * Affiche les postes
+         *
+         * @return void
+         */
+        function showPosts() {
+            fetch('./getAll.php')
+            .then(response => {
+                return response.json();
+            })
+            .then(json => {
+                const posts = json.posts;
+
+                postsDOM.innerHTML = '';
+
+                posts.forEach(post => {
+                    let mediaNames = '';
+                    let mediaTypes = '';
+
+                    // Création d'une string concaténant les noms et types des médias
+                    if (post.medias !== null) {
+                        post.medias.forEach(media => {
+                            mediaNames += `${media.name},`;
+                            mediaTypes += `${media.type},`;
+                        });
+                    }
+
+                    // Suppression de la dernière virgule
+                    mediaNames = mediaNames.substring(0, mediaNames.length - 1);
+                    mediaTypes = mediaTypes.substring(0, mediaTypes.length - 1);
+
+                    $(postsDOM).append(`
+                        <div class="post" data-id="${post.id}">
+                            <my-post comment="${post.comment}" ${mediaNames != '' ? 'medias="' + mediaNames + '"': ''} ${mediaTypes != '' ? 'types="' + mediaTypes + '"': ''} id="${post.id}"></my-post>
+                        </div>`);
+                    
+                    createEditForm(post.id);
+                });
+            })
+            .catch(err => {
+                console.error(err);
+            })
+        }
+
+        //==================================================================================================
+        // Document prêt
+        //==================================================================================================
+
+        $(document).ready(() => {
+            showPosts();
+
+            // Event custom créer dans le fichier upload.js
+            document.addEventListener('readyToReload', () => {
+                showPosts();
+            });
+        });
+    </script>
 </body>
 
 </html>
