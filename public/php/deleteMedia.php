@@ -1,4 +1,12 @@
 <?php
+/**
+ * @filesource deleteMedia.php
+ * @brief Permet de supprimer un média
+ * @author Tanguy Cavagna <tanguy.cvgn@eduge.ch>
+ * @date 2020-02-11
+ * @version 1.0.0
+ */
+
 header('Content-Type: application/json');
 
 require __DIR__ . '/../../vendor/autoload.php';

@@ -1,4 +1,12 @@
 <?php
+/**
+ * @filesource updateComment.php
+ * @brief Permet de modifier le commentaire d'un poste
+ * @author Tanguy Cavagna <tanguy.cvgn@eduge.ch>
+ * @date 2020-02-10
+ * @version 1.0.0
+ */
+
 header('Content-Type: application/json');
 
 require __DIR__ . '/../../vendor/autoload.php';

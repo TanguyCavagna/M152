@@ -1,7 +1,18 @@
 /**
+ * @filesource post.js
+ * @brief Module shadow dom personalisé pour contenir un poste
+ * @author Tanguy Cavagna <tanguy.cvgn@eduge.ch>
+ * @date 2020-02-11
+ * @version 1.0.0
+ */
+
+/**
  * ShadowDOM pour les posts. Cela permet de gérer plus facielement le comportement des posts et évite la surcharge d'infos dans le HTML
  */
 class PostModule extends HTMLElement {
+    /**
+     * Constructeur de mon module
+     */
     constructor() {
         super();
         const id = this.getAttribute('id') || -1;
@@ -45,34 +56,8 @@ class PostModule extends HTMLElement {
             fetch('./deletePost.php', init)
             .then(response => {
                 if (response.status === 200) {
-                    $(postsDOM).empty(); // Variable globale à la page index
-
-                    fetch('./getAll.php')
-                    .then(response => {
-                        return response.json();
-                    })
-                    .then(json => {
-                        const posts = json.posts;
-
-                        posts.forEach(post => {
-                            let mediaNames = '';
-                            let mediaTypes = '';
-
-                            // Création d'une string concaténant les noms et types des médias
-                            if (post.medias !== null) {
-                                post.medias.forEach(media => {
-                                    mediaNames += `${media.name},`;
-                                    mediaTypes += `${media.type},`;
-                                });
-                            }
-
-                            // Suppression de la dernière virgule
-                            mediaNames = mediaNames.substring(0, mediaNames.length - 1);
-                            mediaTypes = mediaTypes.substring(0, mediaTypes.length - 1);
-
-                            $(postsDOM).append(`<my-post comment="${post.comment}" ${mediaNames != '' ? 'medias="' + mediaNames + '"': ''} ${mediaTypes != '' ? 'types="' + mediaTypes + '"': ''} id="${post.id}"></my-post>`);
-                        });
-                    });
+                    let readyToReload = new CustomEvent('readyToReload');
+                    document.dispatchEvent(readyToReload);
                 } else if (response.status === 422) { // Id du poste vide
                     console.log("Id du poste vide");
                 } else if (response.status === 415) { // Id du poste non entier
@@ -132,7 +117,7 @@ class PostModule extends HTMLElement {
                             textarea.classList.add('hide');
                             editBtn.classList.remove('hide');
                             validBtn.classList.add('hide');
-                
+
                             for (let index = 0; index < deleteMediaBtns.length; index++) {
                                 const element = deleteMediaBtns[index];
                                 element.classList.add('hide');
@@ -213,9 +198,6 @@ class PostModule extends HTMLElement {
                 .post {
                     background: #fff;
                     border-radius: 0;
-                }
-                .post + .post {
-                    margin-top: 30px;
                 }
                 .post { border-radius: 0; }
                 .medias {
@@ -349,7 +331,7 @@ class PostModule extends HTMLElement {
                     <svg class="delete-media hide" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
                         <path fill="currentColor" d="M24 20.188l-8.315-8.209 8.2-8.282-3.697-3.697-8.212 8.318-8.31-8.203-3.666 3.666 8.321 8.24-8.206 8.313 3.666 3.666 8.237-8.318 8.285 8.203z"/>
                     </svg>`;
-                
+
                 if (type.includes('image')) {
                     result += `<img src="../uploads/${media}" alt="" class="card-top">`;
                 } else if (type.includes('audio')) {
@@ -361,7 +343,7 @@ class PostModule extends HTMLElement {
                         <source src="../uploads/${media}" type="${type}">
                     </video>`;
                 }
-                
+
                 result += '</div>';
             };
         }
@@ -370,6 +352,7 @@ class PostModule extends HTMLElement {
     }
 }
 
+// Ajout du module aux éléments personalisé
 try {
     customElements.define('my-post', PostModule);
 } catch (e) {

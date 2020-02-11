@@ -14,6 +14,8 @@
 <body>
     <?php require_once '../includes/nav.php'; ?>
 
+    <div class="alerts"></div>
+
     <main class="add-post row">
         <form class="col-md-4 post-form" action="./uploadPost.php" method="POST" enctype="multipart/form-data">
             <div class="form-group progress">
