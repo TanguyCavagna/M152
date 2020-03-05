@@ -19,6 +19,7 @@ class MediaController extends EDatabaseController {
         $this->tableName = 'media';
         $this->fieldId = 'idMedia';
         $this->fieldType = 'typeMedia';
+        $this->fieldSize = 'sizeMedia';
         $this->fieldName = 'nameMedia';
         $this->fieldCreation = 'creationDate';
         $this->fieldModification = 'modificationDate';
@@ -103,10 +104,10 @@ class MediaController extends EDatabaseController {
      * @param string $file_extension Extension du média
      * @return boolean
      */
-    public function Insert(int $postId, string $name, string $type, string $tmp_name, string $file_extension): bool {
+    public function Insert(int $postId, string $name, string $type, string $tmp_name, string $file_extension, int $size): bool {
         $insertQuery = <<<EX
-            INSERT INTO `{$this->tableName}`(`{$this->fieldType}`, `{$this->fieldName}`, `{$this->fieldCreation}`, `{$this->fieldModification}`)
-            VALUES(:type, :name, :creation, :modification)
+            INSERT INTO `{$this->tableName}`(`{$this->fieldType}`, `{$this->fieldSize}`, `{$this->fieldName}`, `{$this->fieldCreation}`, `{$this->fieldModification}`)
+            VALUES(:type, :size, :name, :creation, :modification)
         EX;
 
         $creationTimestamp = date("Y-m-d H:i:s");
@@ -116,6 +117,7 @@ class MediaController extends EDatabaseController {
 
             $requestInsert = $this::getInstance()->prepare($insertQuery);
             $requestInsert->bindParam(':type', $type);
+            $requestInsert->bindParam(':size', $size);
             $requestInsert->bindParam(':name', $name);
             $requestInsert->bindParam(':creation', $creationTimestamp);
             $requestInsert->bindParam(':modification', $creationTimestamp);

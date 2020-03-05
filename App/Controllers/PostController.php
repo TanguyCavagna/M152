@@ -84,7 +84,7 @@ class PostController extends EDatabaseController {
                     $file_extension = '.' . pathinfo($file_name, PATHINFO_EXTENSION);
                     $final_file_name = uniqid() . $file_extension;
                     
-                    if (!$this->mediaController->Insert($lastInsertId, $final_file_name, $medias['type'][$i], $medias['tmp_name'][$i], $file_extension)) {
+                    if (!$this->mediaController->Insert($lastInsertId, $final_file_name, $medias['type'][$i], $medias['tmp_name'][$i], $file_extension, $medias['size'][$i])) {
                         $this::rollBack();
                         return false;
                     }
