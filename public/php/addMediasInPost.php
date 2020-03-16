@@ -77,7 +77,7 @@ if (!$size_error && !$file_type_error) {
         $file_extension = '.' . pathinfo($file_name, PATHINFO_EXTENSION);
         $final_file_name = uniqid() . $file_extension;
         
-        if (!$mediaController->Insert($idPost, $final_file_name, $files['type'][$i], $files['tmp_name'][$i], $file_extension)) {
+        if (!$mediaController->Insert($idPost, $final_file_name, $files['type'][$i], $files['tmp_name'][$i], $file_extension, $files['size'][$i])) {
             http_response_code(200);
             echo json_encode([
                 'errors' => `Une erreur est survenue lors de l\'ajout du media ${file_name}. Il n'a donc pas été ajouter.`
