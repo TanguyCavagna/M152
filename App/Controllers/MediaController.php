@@ -27,6 +27,8 @@ class MediaController extends EDatabaseController {
         $this->relationController = new RelationController();
 
         $this->targetDir = '../../public/uploads/';
+        $this->maxImageWidth = 1000;
+        $this->maxImageHeight = $this->maxImageWidth / (16 / 9);
     }
 
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ PRIVATE FUNCTIONS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -93,6 +95,59 @@ class MediaController extends EDatabaseController {
         }
     }
 
+    /**
+     * Redéfini la taille de l'image
+     *
+     * @param  mixed $traget Image cible
+     * @param  mixed $new Nom de la nouvelle image
+     * @param  mixed $w Largeur maximale
+     * @param  mixed $h Hauteur maximal
+     * @param  mixed $ext Extension de l'image
+     *
+     * @return bool
+     */
+    private function resizeImage(string $traget, string $new, string $type) : bool {
+        list($origWidth, $origHeight) = getimagesize($traget); // Défini les variables $origWidth et $origHeight au valeur correspondante au index du tableau à droite de l'égalité
+
+        if ($origWidth <= $this->maxImageWidth)
+            $w = $origWidth;
+        else
+            $w = $this->maxImageWidth;
+
+        if ($origHeight <= $this->maxImageHeight)
+            $h = $origHeight;
+        else
+            $h = $this->maxImageHeight;
+
+        $img = "";
+        $type = strtolower($type);
+
+        switch ($type) {
+            case 'image/gif':
+                $img = imagecreatefromgif($traget);
+                break;
+            
+            case 'image/png':
+                $img = imagecreatefrompng($traget);
+                break;
+
+            default:
+                $img = imagecreatefromjpeg($traget);
+                break;
+        }
+
+        $trueColorImage = imagecreatetruecolor($w, $h);
+
+        $returnState = false;
+        if (imagecopyresampled($trueColorImage, $img, 0, 0, 0, 0, $w, $h, $origWidth, $origHeight))
+        {
+            if (imagejpeg($trueColorImage, $new, 80))
+                return true;
+        }
+
+        return $returnState;
+    }
+
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ PUBLIC FUNCTIONS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     /**
      * Ajoute un nouveau média
@@ -126,6 +181,9 @@ class MediaController extends EDatabaseController {
             $lastInsertId = $this::getInstance()->lastInsertId();
 
             if (move_uploaded_file($tmp_name, $this->targetDir . $name)) {
+                if (strpos($type, 'image') !== false)
+                    $this->resizeImage($this->targetDir . $name, $this->targetDir . $name, $type);
+
                 if (!$this->relationController->Insert($postId, $lastInsertId)) {
                     $this::rollBack();
                     return false;
