@@ -84,11 +84,11 @@ class MediaController extends EDatabaseController {
             $requestSelect->execute();
             $fileName = $requestSelect->fetch(\PDO::FETCH_ASSOC);
 
-            unlink($this->targetDir . $fileName['nameMedia']);
+            $returnState = unlink($this->targetDir . $fileName['nameMedia']);
 
             $this::commit();
 
-            return true;
+            return $returnState;
         } catch (\PDOException $e) {
             $this::rollback();
             return false;
